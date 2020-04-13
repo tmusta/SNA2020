@@ -2,5 +2,12 @@
 
 The course project for Introduction for Social Network Analysis.
 
-Li Guanchen
-Toni Musta
+Group members:
+- Li Guanchen
+- Toni Musta
+- Mario Sanchez de Paz
+
+Requirements:
+python3
+pandas
+elsapy
