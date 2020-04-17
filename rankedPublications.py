@@ -3,8 +3,15 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+with open("db.json") as f:
+    data = json.load(f)
+
+keylist = list(data.keys())
 institutions = []
 published_articles = []
+
+
 
 for k in keylist:
         if data[k].get('auths'):
