@@ -7,13 +7,18 @@ with open("db.json") as f:
     data = json.load(f)
 print("The database has ",  len(data), "entries")
 print()
-##We select all the DIO from the articles.
+
 keylist = list(data.keys())
 d = {"author": "name", "publications": 0, "colabs": 0}
 
 authorsList = []
 numberPublications = []
 colabs = []
+repeated = 0
+for k in keylist:
+    if data[k].get('auths'):
+        for authors in data[k]['auths']:
+            repeated += 1
 
 for k in keylist:
         if data[k].get('auths'):
@@ -30,8 +35,7 @@ for k in keylist:
 print("Total authors without repetition: ", len(authorsList))
 print()
 
-##The authors are grouped with their publications and colaborations inside a list, and then
-##sorted.
+
 rankingAuthors = []
 for i in range(len(authorsList)):
     d = {'author': authorsList[i], 'publications': numberPublications[i], 'colabs': colabs[i]/numberPublications[i]}
@@ -39,7 +43,24 @@ for i in range(len(authorsList)):
 
 rankingAuthors = sorted(rankingAuthors, key = lambda i: i['publications'], reverse=True)
 
-##For the ranking, the first ten authors have been selected, and divided in three lists.
+
+histogramAuthors = []
+publications = []
+colabs = []
+
+for i in range(len(rankingAuthors)):
+    histogramAuthors.append(rankingAuthors[i]['author'])
+    publications.append(rankingAuthors[i]['publications'])
+    colabs.append(rankingAuthors[i]['colabs'])
+    i += 1
+
+avgColabs = 0
+for c in colabs:
+    avgColabs += c
+
+avgColabs = avgColabs / len(colabs)
+print ("Average colaborations: " + str(avgColabs))
+
 
 histogramAuthors = []
 publications = []
@@ -52,7 +73,9 @@ while i < 10:
     i += 1
 
 
-##Configuration for the histogram
+
+
+
 r1 = np.arange(len(histogramAuthors))
 
 plt.bar(r1, publications, color='#7f6d5f', width=0.25, edgecolor='white', label='publications')

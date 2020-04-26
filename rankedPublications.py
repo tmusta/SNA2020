@@ -24,6 +24,8 @@ for k in keylist:
                     index = institutions.index(authors['affiliation'])
                     published_articles[index] += 1
 
+print("Institutions without repetition: " + str(len(institutions)))
+
 tuple_institutions = []
 for i in range(len(institutions)):
     d = {'name': institutions[i], 'value': published_articles[i]}
@@ -40,7 +42,12 @@ while i < 10:
     num_publications.append(tuple_institutions[i]['value'])
     i+= 1
 
+avgPublic = 0
+for c in published_articles:
+    avgPublic += c
 
+avgPublic = avgPublic / len(published_articles)
+print ("Average publications: " + str(avgPublic))
 
 r1 = np.arange(len(ranked_institutions))
 
