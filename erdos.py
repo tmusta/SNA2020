@@ -11,7 +11,8 @@ def most_collabs(data):
     authorsList = []
     numberPublications = []
     colabs = []
-
+    affList = []
+    
     for k in keylist:
         if data[k].get('auths'):
             for authors in data[k]['auths']:
@@ -19,6 +20,7 @@ def most_collabs(data):
                     authorsList.append(authors['name'])
                     numberPublications.append(1)
                     colabs.append(len(data[k]['auths']))
+                    affList.append(authors["affiliation"])
                 else:
                     index = authorsList.index(authors['name'])
                     numberPublications[index] = numberPublications[index] + 1
@@ -31,11 +33,12 @@ def most_collabs(data):
     ##sorted.
     rankingAuthors = []
     for i in range(len(authorsList)):
-        d = {'author': authorsList[i], 'publications': numberPublications[i], 'colabs': colabs[i]}
+        d = {'author': authorsList[i], 'affiliation': affList[i], 'publications': numberPublications[i], 'colabs': colabs[i]}
         rankingAuthors.append(d)
 
     rankingAuthors = sorted(rankingAuthors, key = lambda i: i['colabs'], reverse=True)
-    return rankingAuthors[0]
+    print(rankingAuthors[0])
+    return {rankingAuthors[0]["author"]: {"links": [], "affiliation": rankingAuthors[0]["affiliation"]}}
 
 def erdos_iter(data, graph, zero):
     for _, j in data.items():            
@@ -45,6 +48,7 @@ def erdos_iter(data, graph, zero):
         if len(hits):
             for k in j["auths"]:
                 new = True
+
                 for level in graph[:-1]:
                     if k["name"] in level:
                         new = False
@@ -52,15 +56,17 @@ def erdos_iter(data, graph, zero):
                 if not new:
                     continue
                 if not k["name"] in graph[-1]:
-                    graph[-1][k["name"]] = []
+                    graph[-1][k["name"]] = {"links":[], "affiliation":k["affiliation"]}
+                    #graph[-1][k["name"]] = []
                 for h in hits:
                     if not h in graph[-1][k["name"]]:
-                        graph[-1][k["name"]].append(h)
+                        graph[-1][k["name"]]["links"].append(h)
     return graph
 
 def erdos_graph(data, zero, diameter=2):
     ### CALCULATES ERDOS GRAPH UP TO SOME ERDOS NUMBER. IF NUMBER IS LESS THAN ZERO, WE CALCULATE FULL GRAPH
-    graph = [{zero: []}]
+    #graph = [{zero: {"links": [], "affiliation"}}]
+    graph = [zero]
     if diameter > 0:
         for i in range(diameter):
             graph.append({})
@@ -74,7 +80,8 @@ def erdos_graph(data, zero, diameter=2):
 
 def get_erdos(data, zero, author):
     ### ERDOS DISTANCE BETWEEN TWO AUTHORS
-    graph = [{zero: []}]
+    #graph = [{zero: []}]
+    graph = [zero]
     while len(graph[-1]) and not author in graph[-1]:
         graph.append({})
         graph = erdos_iter(data, graph, zero)
@@ -88,6 +95,9 @@ def visualize_erdos(graph, labels_on=True):
     nodes = []
     edges = []
     colors = []
+    ref_aff = ""
+    for i,j in graph[0].items():
+        ref_aff = j["affiliation"]
     
     labels = {}
     for i, level in enumerate(graph):
@@ -97,8 +107,11 @@ def visualize_erdos(graph, labels_on=True):
             if not i:
                 colors.append((1, 0,0))
             else:
-                colors.append((1/(len(graph)-i+0.5), 1/(len(graph)-i+0.5), 1))
-            for conn in conns:
+                if conns["affiliation"] == ref_aff:
+                    colors.append((1, 1/(len(graph)-i+0.5), 1/(len(graph)-i+0.5)))
+                else:
+                    colors.append((1/(len(graph)-i+0.5), 1/(len(graph)-i+0.5), 1))
+            for conn in conns["links"]:
                 G.add_edge(name, conn)
                 edges.append([name, conn])
         if labels_on:
@@ -118,7 +131,7 @@ if __name__=="__main__":
     labels_on = False
     if len(sys.argv) > 2:
         labels_on = True
-    zero = most_collabs(data)["author"]
+    zero = most_collabs(data)
     print()
     print("Task 8. Amounts of authors with Erdos no. 0, 1, 2 respectively. Erdos no. 0 belongs to Jessica D. Sundquist")
     graph = erdos_graph(data, zero)
