@@ -26,6 +26,24 @@ for k in keylist:
 
 print("Institutions without repetition: " + str(len(institutions)))
 
+
+countries = ['China', 'USA', 'Japan', 'Italy']
+countAux = [0, 0, 0, 0]
+
+for i in range(len(institutions)):
+    if institutions[i][-5:] == 'China':
+        countAux[0] += published_articles[i]
+    elif institutions [i][-3:] == 'USA':
+        countAux[1] += published_articles[i]
+    elif institutions[i][-5:] == 'Japan':
+        countAux[2] += published_articles[i]
+    elif institutions[i][-5:] == 'Italy':
+        countAux[3] += published_articles[i]
+
+for c in range(len(countries)):
+    print(countries[c] + " has a total of " + str(countAux[c]) + " articles.")
+
+
 tuple_institutions = []
 for i in range(len(institutions)):
     d = {'name': institutions[i], 'value': published_articles[i]}
@@ -36,6 +54,7 @@ tuple_institutions = sorted(tuple_institutions, key = lambda i: i['value'], reve
 ranked_institutions = []
 num_publications = []
 i = 0
+
 
 while i < 10:
     ranked_institutions.append(tuple_institutions[i]['name'])
@@ -57,6 +76,6 @@ plt.bar(r1, num_publications, color='#7f6d5f', width=0.25, edgecolor='white', la
 
 plt.xticks(r1, ranked_institutions, color='orange', rotation=19, fontweight='bold', fontsize='6', horizontalalignment='right')
 
-plt.xlabel('Institutions', fontweight='bold', color = 'orange', fontsize='7', horizontalalignment='center')
+plt.xlabel('Institutions', fontweight='bold', color = 'orange', fontsize='15', horizontalalignment='center')
 plt.legend()
 plt.show()

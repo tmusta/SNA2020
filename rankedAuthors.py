@@ -14,19 +14,27 @@ d = {"author": "name", "publications": 0, "colabs": 0}
 authorsList = []
 numberPublications = []
 colabs = []
+institution = []
 repeated = 0
 for k in keylist:
     if data[k].get('auths'):
         for authors in data[k]['auths']:
             repeated += 1
 
+usaAuthors = 0
+chinaAuthors = 0
 for k in keylist:
         if data[k].get('auths'):
             for authors in data[k]['auths']:
                 if authors['name'] not in authorsList:
                     authorsList.append(authors['name'])
+                    institution.append(authors['affiliation'])
                     numberPublications.append(1)
                     colabs.append(len(data[k]['auths']))
+                    if authors['affiliation'][-5:] == "China":
+                        chinaAuthors += 1
+                    elif authors['affiliation'][-3:] == "USA":
+                        usaAuthors += 1
                 else:
                     index = authorsList.index(authors['name'])
                     numberPublications[index] = numberPublications[index] + 1
@@ -35,10 +43,13 @@ for k in keylist:
 print("Total authors without repetition: ", len(authorsList))
 print()
 
+print("China has a total of " + str(chinaAuthors) + " authors")
+print("USA has a total of " + str(usaAuthors) + " authors")
+
 
 rankingAuthors = []
 for i in range(len(authorsList)):
-    d = {'author': authorsList[i], 'publications': numberPublications[i], 'colabs': colabs[i]/numberPublications[i]}
+    d = {'author': authorsList[i], 'publications': numberPublications[i], 'colabs': colabs[i]/numberPublications[i], 'institution': institution[i]}
     rankingAuthors.append(d)
 
 rankingAuthors = sorted(rankingAuthors, key = lambda i: i['publications'], reverse=True)
@@ -47,6 +58,7 @@ rankingAuthors = sorted(rankingAuthors, key = lambda i: i['publications'], rever
 histogramAuthors = []
 publications = []
 colabs = []
+
 
 for i in range(len(rankingAuthors)):
     histogramAuthors.append(rankingAuthors[i]['author'])
